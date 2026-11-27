@@ -13,8 +13,8 @@ on:
   workflow_dispatch:
 
 env:
-  CONTEXT: .
-  DOCKERFILE: ./rpm/Dockerfile
+  CONTEXT: rpm/
+  DOCKERFILE: Dockerfile
   IMAGE_NAME: repo-sync-rpm
   IMAGE_REPOSITORY: cookewe
   REGISTRY: quay.io
