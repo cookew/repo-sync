@@ -27,8 +27,7 @@ jobs:
       id-token: write
       security-events: read
 
-    runs-on:
-      group: ubuntu-latest
+    runs-on: ubuntu-latest
 
     steps:
     - name: Check out repository
