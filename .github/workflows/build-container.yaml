@@ -15,7 +15,7 @@ on:
 env:
   CONTEXT: ./rpm
   DOCKERFILE: rpm/Dockerfile
-  IMAGE_NAME: repo-sync-rpm
+  IMAGE_NAME: repo-sync/rpm
   IMAGE_REPOSITORY: cookewe
   REGISTRY: quay.io
 
