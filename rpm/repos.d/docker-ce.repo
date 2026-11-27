@@ -1,0 +1,73 @@
+[docker-ce-centos-9]
+name = Docker CE Stable - x86_64
+baseurl = https://download.docker.com/linux/centos/9/x86_64/stable
+enabled = 0
+enabled_metadata = 1
+gpgcheck = 1
+gpgkey = https://download.docker.com/linux/centos/gpg
+metadata_expire = 3600
+
+[docker-ce-centos-10]
+name = Docker CE Stable - x86_64
+baseurl = https://download.docker.com/linux/centos/10/x86_64/stable
+enabled = 0
+enabled_metadata = 1
+gpgcheck = 1
+gpgkey = https://download.docker.com/linux/centos/gpg
+metadata_expire = 3600
+
+[docker-ce-rhel-8]
+name = Docker CE Stable - x86_64
+baseurl = https://download.docker.com/linux/rhel/8/x86_64/stable
+enabled = 0
+enabled_metadata = 1
+gpgcheck = 1
+gpgkey = https://download.docker.com/linux/rhel/gpg
+metadata_expire = 3600
+
+[docker-ce-rhel-9]
+name = Docker CE Stable - x86_64
+baseurl = https://download.docker.com/linux/rhel/9/x86_64/stable
+enabled = 0
+enabled_metadata = 1
+gpgcheck = 1
+gpgkey = https://download.docker.com/linux/rhel/gpg
+metadata_expire = 3600
+
+[docker-ce-rhel-10]
+name = Docker CE Stable - x86_64
+baseurl = https://download.docker.com/linux/rhel/10/x86_64/stable
+enabled = 0
+enabled_metadata = 1
+gpgcheck = 1
+gpgkey = https://download.docker.com/linux/rhel/gpg
+metadata_expire = 3600
+
+[docker-ce-rocky-8]
+name = Docker CE Stable - x86_64
+baseurl = https://download.docker.com/linux/rocky/8/x86_64/stable
+enabled = 0
+enabled_metadata = 1
+gpgcheck = 1
+gpgkey = https://download.docker.com/linux/rocky/gpg
+metadata_expire = 3600
+
+[docker-ce-rocky-9]
+name = Docker CE Stable - x86_64
+baseurl = https://download.docker.com/linux/rocky/9/x86_64/stable
+enabled = 0
+enabled_metadata = 1
+gpgcheck = 1
+gpgkey = https://download.docker.com/linux/rocky/gpg
+metadata_expire = 3600
+
+[docker-ce-rocky-10]
+name = Docker CE Stable - x86_64
+baseurl = https://download.docker.com/linux/rocky/10/x86_64/stable
+enabled = 0
+enabled_metadata = 1
+gpgcheck = 1
+gpgkey = https://download.docker.com/linux/rocky/gpg
+metadata_expire = 3600
+
+#* vim: set filetype=dosini : *#

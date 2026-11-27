@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -euo pipefail
+
+if [ "${DISABLE_CRON:-}" == "" ]
+then
+  {
+  echo "MAILTO=${MAILTO:-}"
+  echo "CHOWN=${CHOWN:-}"
+  echo "REPO_MIRROR_SUB_DIR=${REPO_MIRROR_SUB_DIR:-}"
+  echo "LOCAL_REPO_MIRROR_URL=${LOCAL_REPO_MIRROR_URL:-}"
+  echo "MAX_PARALLEL_DOWNLOADS=${MAX_PARALLEL_DOWNLOADS:-}"
+  echo "${CRON_SCHEDULE:-"* 3 * * *"} /cron-script > /proc/1/fd/1 2>/proc/1/fd/2"
+  } | crontab
+
+  echo "Crontab content:"
+  crontab -l
+fi
+
+if [ "${NOW:-}" != "" ] && [ "${DISABLE_CRON:-}" == "" ]
+then
+  /cron-script
+elif [ "${NOW:-}" != "" ] && [ "${DISABLE_CRON:-}" != "" ]
+then
+  exec /cron-script
+fi
+
+if [ "${DISABLE_CRON:-}" != "" ]
+then
+  exit 0
+fi
+
+exec /usr/sbin/crond -n -s

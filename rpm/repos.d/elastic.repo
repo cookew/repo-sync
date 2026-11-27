@@ -1,0 +1,12 @@
+[elastic-9]
+name = Elastic 9
+baseurl = https://artifacts.elastic.co/packages/9.x/yum
+enabled = 0
+enabled_metadata = 1
+exclude = *i686*,*aarch64*
+#exclude = *-8.[0-9].*,*-8.1[0-5].*,*i686*
+gpgcheck = 1
+gpgkey = https://artifacts.elastic.co/GPG-KEY-elasticsearch
+metadata_expire = 3600
+
+#* vim: set filetype=dosini : *#

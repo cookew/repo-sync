@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -euo pipefail
+
+date
+
+src=rsync://rsync.alpinelinux.org/alpine/
+dest=/repo-mirror/
+echo "src=${src}"
+echo "dest=${dest}"
+
+EXCLUDES_FILE=/apk-repo/apk-repo/excludes
+if [ ! -f ${EXCLUDES_FILE} ];
+then
+    cp /excludes ${EXCLUDES_FILE}
+fi
+cat ${EXCLUDES_FILE}
+
+if [ ! -d /repo-mirror ];
+then
+    mkdir /repo-mirror
+fi
+
+mkdir -p "$dest"
+/usr/bin/rsync \
+        --archive \
+        --update \
+        --hard-links \
+        --delete \
+        --delete-after \
+        --delete-excluded \
+        --delay-updates \
+        --timeout=600 \
+        --progress \
+        --exclude-from=${EXCLUDES_FILE} \
+        "${src}" "${dest}"
+
+chown -R ${CHUSER:-0}:${CHGRP:-0} /repo-mirror/
+find /repo-mirror/ -type d -exec chmod -R 755 {} + ;
+find /repo-mirror/ -type f -exec chmod -R 644 {} + ;

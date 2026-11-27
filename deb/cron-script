@@ -1,0 +1,86 @@
+#!/bin/bash
+
+set -euo pipefail
+
+date
+
+MIRROR_FILE=/deb-repo/deb-repo/mirror
+if [ ! -f "${MIRROR_FILE}" ]
+then
+    cp /mirror $MIRROR_FILE
+fi
+
+if [ ! -f "${MIRROR_FILE}" ]
+then
+    echo "Mirror file does not exist :("
+    exit 1
+fi
+
+if [ ! -d /repo-mirror ]
+then
+    mkdir /repo-mirror
+fi
+
+while IFS= read -r line
+do
+
+    echo "${line}"
+
+    if echo "${line}" | grep '^#' > /dev/null
+    then
+        continue
+    fi
+
+    unset HOST
+    unset ROOT
+    unset DIST
+    unset SECTION
+    unset ARCH
+    unset METHOD
+    unset EXTRA
+
+    HOST=$(echo "${line}" | cut -f 1)
+    ROOT=$(echo "${line}" | cut -f 2)
+    DIST=$(echo "${line}" | cut -f 3)
+    SECTION=$(echo "${line}" | cut -f 4)
+    ARCH=$(echo "${line}" | cut -f 5)
+    METHOD=$(echo "${line}" | cut -f 6)
+    EXTRA=$(echo "${line}" | cut -f 7)
+
+    echo "HOST=${HOST}"
+    echo "ROOT=${ROOT}"
+    echo "DIST=${DIST}"
+    echo "SECTION=${SECTION}"
+    echo "ARCH=${ARCH}"
+    echo "METHOD=${METHOD}"
+    echo "EXTRA=${EXTRA}"
+
+    OPTS=""
+
+    if [ "${ROOT}" != "" ]
+    then
+      OPTS="${OPTS} --root=${ROOT}"
+    fi
+
+    if [ "${DIST}" != "" ]
+    then
+      OPTS="${OPTS} --dist=${DIST}"
+    fi
+
+    if [ "${SECTION}" != "" ]
+    then
+      OPTS="${OPTS} --section=${SECTION}"
+    fi
+
+    if [ "${ARCH}" != "" ]
+    then
+      OPTS="${OPTS} --arch=${ARCH}"
+    fi
+
+    echo "Running debmirror"
+    debmirror "/repo-mirror/${HOST}/${ROOT}" --nosource --host="${HOST}" --passive --method="${METHOD}" --progress ${OTHERARGS} --no-check-gpg --timeout=5 --rsync-options="--timeout=1" ${OPTS} ${EXTRA}
+    echo "done"
+
+done < "${MIRROR_FILE}"
+
+#chown -R ${CHOWN:-0:100} /repo-mirror/

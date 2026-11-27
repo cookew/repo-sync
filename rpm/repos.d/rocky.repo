@@ -1,0 +1,55 @@
+[rocky-8-x86_64-appstream]
+name = Rocky Linux 8 x86_64 - AppStream
+baseurl = https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/
+enabled = 0
+enabled_metadata = 1
+gpgcheck = 1
+gpgkey = https://dl.rockylinux.org/pub/rocky/8/AppStream/x86_64/os/RPM-GPG-KEY-rockyofficial
+metadata_expire = 3600
+
+[rocky-8-x86_64-baseos]
+name = Rocky Linux 8 x86_64 - BaseOS
+baseurl = https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/
+enabled = 0
+enabled_metadata = 1
+gpgcheck = 1
+gpgkey = https://dl.rockylinux.org/pub/rocky/8/BaseOS/x86_64/os/RPM-GPG-KEY-rockyofficial
+metadata_expire = 3600
+
+[rocky-9-x86_64-appstream]
+name = Rocky Linux 9 x86_64 - AppStream
+baseurl = https://dl.rockylinux.org/pub/rocky/9/AppStream/x86_64/os/
+enabled = 0
+enabled_metadata = 1
+gpgcheck = 1
+gpgkey = https://dl.rockylinux.org/pub/rocky/9/AppStream/x86_64/os/RPM-GPG-KEY-Rocky-9
+metadata_expire = 3600
+
+[rocky-9-x86_64-baseos]
+name = Rocky Linux 9 x86_64 - BaseOS
+baseurl = https://dl.rockylinux.org/pub/rocky/9/BaseOS/x86_64/os/
+enabled = 0
+enabled_metadata = 1
+gpgcheck = 1
+gpgkey = https://dl.rockylinux.org/pub/rocky/9/BaseOS/x86_64/os/RPM-GPG-KEY-Rocky-9
+metadata_expire = 3600
+
+[rocky-10-x86_64-appstream]
+name = Rocky Linux 10 x86_64 - AppStream
+baseurl = https://dl.rockylinux.org/pub/rocky/10/AppStream/x86_64/os/
+enabled = 0
+enabled_metadata = 1
+gpgcheck = 1
+gpgkey = https://dl.rockylinux.org/pub/rocky/10/AppStream/x86_64/os/RPM-GPG-KEY-Rocky-10
+metadata_expire = 3600
+
+[rocky-10-x86_64-baseos]
+name = Rocky Linux 10 x86_64 - BaseOS
+baseurl = https://dl.rockylinux.org/pub/rocky/10/BaseOS/x86_64/os/
+enabled = 0
+enabled_metadata = 1
+gpgcheck = 1
+gpgkey = https://dl.rockylinux.org/pub/rocky/10/BaseOS/x86_64/os/RPM-GPG-KEY-Rocky-10
+metadata_expire = 3600
+
+#* vim: set filetype=dosini : *#

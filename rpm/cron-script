@@ -1,0 +1,137 @@
+#!/bin/bash
+
+set -euo pipefail
+
+echo "Starting cron-script"
+
+MAX_PARALLEL_DOWNLOADS="${MAX_PARALLEL_DOWNLOADS:-3}"
+REPO_MIRROR_SUB_DIR="${REPO_MIRROR_SUB_DIR:-rpm}"
+LOCAL_REPO_MIRROR_URL="${LOCAL_REPO_MIRROR_URL:-http://localhost/${REPO_MIRROR_SUB_DIR}}"
+
+function ini_compare() {
+  local file
+  local section
+  local key
+  local value
+
+  file=${1}
+  section=${2}
+  key=${3}
+  value=${4}
+
+  if [ ! -f "${file}" ]
+  then
+    echo "INI-ERR: File does not exist"
+    echo "INI-ERR: ${file}"
+    exit 1
+  fi
+
+  if ! grep -E "^\s*?\[${section}\]" "${file}" > /dev/null 2>&1
+  then
+    echo "INI-ERR: Section does not exist. ${section}"
+    return 1
+  fi
+
+  local a
+  a="$(sed -n "/^\[${section}\]/,/^\[/p" "${file}" | head -n -1 | grep -E "^\s*?${key}\s*?=\s*?" | sed "s/^\s*${key}\s*=\s*//g")"
+
+  if [ "${a}" == "${value}" ]
+  then
+    return 0
+  else
+    return 1
+  fi
+}
+
+if [ "$(find /etc/yum.repos.d -maxdepth 1 -type f | wc -l)" != "0" ]
+then
+  echo "Removing existing /etc/yum.repos.d files"
+  rm /etc/yum.repos.d/*
+fi
+
+if [ ! -d /repos.d/rpm-repo ]
+then
+  echo "Creating /repos.d/rpm-repo directory"
+  mkdir -p /repos.d/rpm-repo
+fi
+
+if [ "$(find /repos.d/rpm-repo -maxdepth 1 | wc -l)" == "0" ]
+then
+  echo "Copying repository templates to /repos.d/rpm-repo"
+  cp /repos.templates/* /repos.d/rpm-repo/
+fi
+
+echo "List of files in /repos.d/rpm-repo"
+ls -al /repos.d/rpm-repo
+
+if [ ! -d "/repo-mirror/${REPO_MIRROR_SUB_DIR}/gpgkeys" ]
+then
+  echo "Creating /repo-mirror/${REPO_MIRROR_SUB_DIR}/gpgkeys directory"
+  mkdir -p "/repo-mirror/${REPO_MIRROR_SUB_DIR}/gpgkeys"
+fi
+
+for r in /repos.d/rpm-repo/*.repo
+do
+  bname="$(basename "${r}")"
+  echo "Repo File Name: ${bname}"
+
+  sections="$(grep -E "^\s*?\[.*\]" "/repos.d/rpm-repo/${bname}" | sed 's/\s*[][]//g')"
+  for section in ${sections}
+  do
+    echo "Section: ${section}"
+
+    if ! ini_compare "/repos.d/rpm-repo/${bname}" "${section}" "enabled" "1"
+    then
+      echo "${section}: Section is not enabled, skipping"
+      continue
+    fi
+
+    cp "/repos.d/rpm-repo/${bname}" /etc/yum.repos.d/
+
+    echo "${section}: Importing GPG key"
+    gpgkey="$(dnf config-manager --dump "${section}" | grep -E gpgkey | cut -d "=" -f 2 | sed 's/^[[:space:]]*//g')"
+    local_gpgkey="/repo-mirror/${REPO_MIRROR_SUB_DIR}/gpgkeys/${section}.gpg"
+    if [[ "${gpgkey}" == file://* ]]
+    then
+      cp "${gpgkey#file://}" "/repo-mirror/${REPO_MIRROR_SUB_DIR}/gpgkeys/"
+    elif [[ "${gpgkey}" == http://* || "${gpgkey}" == https://* ]]
+    then
+      curl -o "${local_gpgkey}" -L "${gpgkey}"
+    fi
+
+    echo "${section}: Importing GPG key: ${local_gpgkey}"
+    rpm --import "${local_gpgkey}"
+
+    local_gpgkey_url="${LOCAL_REPO_MIRROR_URL}/${local_gpgkey#\/repo-mirror\/"${REPO_MIRROR_SUB_DIR}"\/}"
+    echo "${section}: Local GPG key URL: ${local_gpgkey_url}"
+    {
+      echo "[${section}]"
+      echo "baseurl = ${LOCAL_REPO_MIRROR_URL}/${REPO_MIRROR_SUB_DIR}/${section}"
+      echo "enabled = 1"
+      echo "enabled_metadata = 1"
+      dnf config-manager --dump "${section}" | grep -E "^exclude = "
+      dnf config-manager --dump "${section}" | grep -E "^excludepkgs = "
+      echo "gpgcheck = 1"
+      echo "gpgkey = ${local_gpgkey_url}"
+      dnf config-manager --dump "${section}" | grep -E "^name = "
+      echo "sslverify = 1"
+    } > "/repo-mirror/${REPO_MIRROR_SUB_DIR}/${section}.repo"
+
+    echo "${section}: Running dnf reposync $(date)"
+    time dnf reposync --color true --delete --download-metadata --download-path "/repo-mirror/${REPO_MIRROR_SUB_DIR}/${section}" --downloadcomps --gpgcheck --norepopath --remote-time --repoid="${section}" --setopt "max_parallel_downloads=${MAX_PARALLEL_DOWNLOADS:-3}" --setopt fastestmirror=True
+    echo "${section}: Finished dnf reposync $(date)"
+
+    echo "${section}: Removing temporary repo file"
+    rm -f "/etc/yum.repos.d/*"
+
+    if [ "${CHOWN:-}" != "" ]
+    then
+      echo "${section}: Changing ownership of files to ${CHOWN}"
+      chown -R "${CHOWN}" "/repo-mirror/${REPO_MIRROR_SUB_DIR}/${section}"
+    fi
+
+    echo "${section}: Finished syncing section"
+  done
+done
+
+du -chs "/repo-mirror/${REPO_MIRROR_SUB_DIR}"/* | tee "/repo-mirror/${REPO_MIRROR_SUB_DIR}/disk_usage.txt"

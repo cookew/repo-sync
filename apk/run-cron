@@ -1,0 +1,33 @@
+#!/bin/bash
+
+set -euo pipefail
+
+TIMEZONE=${TIMEZONE:-US/Mountain}
+if [ ! -f "/usr/share/zoneinfo/${TIMEZONE}" ]
+then
+  echo "Invalid timezone setting"
+  echo "Ensure timezone exists in /usr/share/zoneinfo/"
+  exit 1
+fi
+
+echo "${TIMEZONE}" > /etc/timezone
+ln -sf "/usr/share/zoneinfo/${TIMEZONE}" /etc/localtime
+
+cat << EOF > /cront
+MAILTO="${MAILTO}"
+CHUSER="${CHUSER}"
+CHGRP="${CHGRP}"
+${CRON_SCHEDULE:-"* 2 * * *"} /cron-script > /proc/1/fd/1 2>/proc/1/fd/2
+EOF
+
+cat /cront | crontab
+crontab -l
+rm /cront
+
+# Run cron in the foreground
+if [ -z "${NOW:-}" ]
+then
+    /usr/sbin/cron -f
+else
+    /cron-script
+fi

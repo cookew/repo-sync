@@ -1,0 +1,11 @@
+# Use tabs between fields
+# Use pound signs to comment out lines
+#REPO BASE URL\t	SUBDIR\t	DIST\t	SECTION\t	ARCH\t	METHOD\t	EXTRA
+download.docker.com	linux/debian	trixie	stable	amd64,arm64	https
+deb.debian.org	debian	trixie,trixie-updates	main,contrib,non-free,non-free-firmware,main/debian-installer	amd64,arm64	https	--di-dist=dists --di-arch=arches
+deb.debian.org	debian-security	trixie-security	main,contrib,non-free,non-free-firmware	amd64,arm64	https
+archive.raspberrypi.com	debian	trixie	main	arm64,armhf	https
+us.archive.ubuntu.com	ubuntu	noble,noble-security,noble-updates,noble-backports,questing,questing-security,questing-updates,questing-backports	main,restricted,universe,multiverse,main/debian-installer,universe/debian-installer,multiverse/debian-installer,restricted/debian-installer	amd64	https
+ports.ubuntu.com	ubuntu-ports	noble,noble-security,noble-updates,noble-backports,questing,questing-security,questing-updates,questing-backports	main,restricted,universe,multiverse,main/debian-installer,universe/debian-installer,multiverse/debian-installer,restricted/debian-installer	arm64	https
+#pkgs.k8s.io/core:/stable:	1.31	deb https
+#archive.kali.org	kali    kali-rolling	maine,contrib,non-free  amd64   https
